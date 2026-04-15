@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cookie OS | Main Interface</title>
+
+        <!-- CSS -->
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+        <!-- Website Icon -->
+        <link rel="icon" href="{{ url_for('static', filename='logo_transparent.png') }}" type="image/x-icon">
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,80₀;1,9₀&display=swap" rel="stylesheet">
+
+    </head>
+
+    <body>
+        <!-- Main Container -->
+        <div class="main-container">
+            <img src="{{ url_for('static', filename='assets/Heart.png') }}" alt="Heart decoration" class="decor-heart">
+            
+            <!-- Sidebar -->
+            <div class="sidebar-container">
+                <!-- Logo -->
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Cookie OS Logo">
+                </div>
+
+                <!-- Navigation -->
+                <div class="navigation">
+                    <ul>
+                        <li><a href="#">
+                            <img src="{{ url_for('static', filename='assets/icons/sidebar_1.png') }}" alt="Process Manager" class="nav-icon">
+                        </a></li>
+                        <li><a href="#">
+                            <img src="{{ url_for('static', filename='assets/icons/sidebar_2.png') }}" alt="Memory Management" class="nav-icon">
+                        </a></li>
+                        <li><a href="#">
+                            <img src="{{ url_for('static', filename='assets/icons/sidebar_3.png') }}" alt="File System" class="nav-icon">
+                        </a></li>
+                        <li><a href="#">
+                            <img src="{{ url_for('static', filename='assets/icons/sidebar_4.png') }}" alt="Input/Output Simulation" class="nav-icon">
+                        </a></li>
+                    </ul>
+                </div>
+
+                
+            </div>
+
+            <!-- Content Container-->
+            <div class="content-container">
+                <!-- Header-->
+                <div class="header">
+                    <div class="header-text">
+                        <h1>Hello! Welcome</h1>
+                        <p>April 14, 2026 | Tuesday</p>
+                    </div>
+
+                    <div class="picture-icon">
+
+                    </div>
+                </div>
+
+                <!--Process Stats-->
+                <div class="process-stats">
+                    <div class="stat">
+                        <img src="{{ url_for('static', filename='assets/icons/CPU_load.png')}}" alt="CPU Load" class="stat-icon">
+                        <div class="stat-info">
+                            <p>CPU Load</p>
+                            <h2>98%</h2>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <img src="{{ url_for('static', filename='assets/icons/Memory.png')}}" alt="Memory Usage" class="stat-icon">
+                        <div class="stat-info">
+                            <p>Memory Usage</p>
+                            <h2>75%</h2>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <img src="{{ url_for('static', filename='assets/icons/Active_jobs.png')}}" alt="Active Jobs" class="stat-icon">
+                        <div class="stat-info">
+                            <p>Active Jobs</p>
+                            <h2>12</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Process Manager-->
+                <div class="process-manager">
+                    <div class="process-table">
+                        <div class="icon-text">
+                            <img src="{{ url_for('static', filename='assets/icons/Process_manager.png')}}" alt="Process Manager">
+                            <p>Process Manager</p>
+                        </div>
+
+                        <div class="table-label">
+                            <p>PID</p>
+                            <p>Name</p>
+                            <p>Priority</p>
+                            <p>Current State</p>
+                        </div>
+
+                        <hr>
+
+                        <div class="algorithm">
+                            <span>FCFS</span>
+                            <span>Round Robin</span>
+                            <input type="text" placeholder="Time Quantum (ms)" class="time-quantum-input">
+                        </div>
+
+                        <div class="process-controls">
+                            <button class="control-button">
+                                <img src="{{ url_for('static', filename='assets/icons/play.png')}}" alt="Add Process">
+                            </button>
+                            
+                            <button class="control-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Reset.png')}}" alt="Reset Process">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="process-visualization">
+                        <div class="icon-text">
+                            <img src="{{ url_for('static', filename='assets/icons/CPU_scheduler.png')}}" alt="Process Visualization">
+                            <p>CPU Scheduler</p>
+                        </div>
+                        
+                        <!--Gantt Chart-->
+                        <div class="gantt-chart">
+                            <p>Gantt Chart</p>
+
+                            <div class="gantt-chart-container">
+
+                            </div>
+                        </div>
+
+                        <!--Waiting Time Trends-->
+                        <div class="waiting-time-graph">
+                            <p>Waiting Time Trends</p>
+
+                            <div class="waiting-time-container">
+                                
+                            </div>
+                        </div>
+
+                        <button class="add-process-btn">
+                            <img src="{{ url_for('static', filename='assets/icons/Add_process.png')}}" alt="Add Process">
+                            <p>Add Process</p>
+                        </button>
+
+                    </div>
+                </div>
+
+                <div class="process-calculation">
+                    <div class="calculation-item">
+                        <div class="result-icon">
+                            <img src="{{ url_for('static', filename='assets/icons/CPU_utilization.png')}}" alt="CPU Utilization">
+                        </div>
+
+                        <div class="result-container">
+                            <p>CPU Utilization</p>
+                            <h2>85%</h2>
+                        </div>
+                    </div>
+
+                    <div class="calculation-item">
+                        <div class="result-icon">
+                            <img src="{{ url_for('static', filename='assets/icons/turnaround_time.png')}}" alt="Average Turnaround Time">
+                        </div>
+
+                        <div class="result-container">
+                            <p>Average Turnaround Time</p>
+                            <h2>60%</h2>
+                        </div>
+                    </div>
+
+                    <div class="calculation-item">
+                        <div class="result-icon">
+                            <img src="{{ url_for('static', filename='assets/icons/waiting_time.png')}}" alt="Average Waiting Time">
+                        </div>
+
+                        <div class="result-container">
+                            <p>Average Waiting Time</p>
+                            <h2>45%</h2>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--Memory Management-->
+                <div class="icon-text">
+                    <img src="{{ url_for('static', filename='assets/icons/CPU_scheduler.png')}}" alt="Memory Management">
+                    <p>Memory Management</p>
+                </div>
+
+                <div class="memory-management">
+                    <div class="memory-table">
+                        <div class="heart-icon">
+                            <img src="{{ url_for('static', filename='assets/icons/Heart_outline.png')}}" alt="Heart Outline">
+                        </div>
+                    </div>
+
+                    <div class="memory-stats">
+                        <div class="memory-item">
+                            <div class="memory-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Memory_usage.png')}}" alt="Memory Usage">
+                            </div>
+                            
+                            <div class="memory-text">
+                                <p>In Use (Compressed)</p>
+                                <h2>16 GB</h2>
+                            </div>
+                        </div>
+
+                        <div class="memory-item">
+                            <div class="memory-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Available_space.png')}}" alt="Available Space">
+                            </div>
+                            <div class="memory-text">
+                                <p>Available Space</p>
+                                <h2>2 GB</h2>
+                            </div>
+                        </div>
+
+                        <div class="memory-item">
+                            <div class="memory-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Speed.png')}}" alt="Speed">
+                            </div>
+
+                            <div class="memory-text">
+                                <p>Speed</p>
+                                <h2>3200 MT/s</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!--File System-->
+                <div class="icon-text">
+                    <img src="{{ url_for('static', filename='assets/icons/File_system.png')}}" alt="File System">
+                    <p>File System</p>
+                </div>
+
+                <div class="file-system">
+                    <div class="file-table">
+                        <div class="table-label">
+                            <p>Name</p>
+                            <p>Date Modified</p>
+                            <p>Type</p>
+                            <p>Size</p>
+                        </div>
+
+                        <hr>
+
+                        <div class="file-controls">
+                            <button class="file-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Add_file.png')}}" alt="Add File">
+                            </button>
+
+                            <button class="file-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Remove_file.png')}}" alt="Remove File">
+                            </button>
+                            
+                            <button class="file-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Print_file.png')}}" alt="Print File">
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!--Input/Output Simulation-->
+                <div class="icon-text">
+                    <img src="{{ url_for('static', filename='assets/icons/Input_output.png')}}" alt="Input/Output Simulation">
+                    <p>Input/Output Simulation</p>
+                </div>
+
+                <div class="io-simulation">
+
+                    <div class="io-table">
+                        <div class="table-label">
+                            <p>Spooling</p>
+                            <p>Status</p>
+                            <p>Queue Length</p>
+                        </div>
+
+                        <hr>
+
+                        <div class="io-controls">
+                            <button class="io-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Pause.png')}}" alt="Start Spooling">
+                            </button>
+
+                            <button class="io-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Play.png')}}" alt="Stop Spooling">
+                            </button>
+                            
+                            <button class="io-ctrl-button">
+                                <img src="{{ url_for('static', filename='assets/icons/Reset.png')}}" alt="Reset Spooling">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="io-stats">
+                        <div class="io-item">
+                            <div class="io-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Printer_status.png')}}" alt="Printer Status">
+                            </div>
+
+                            <div class="io-text">
+                                <p>Printer Status</p>
+                                <h2>Available</h2>
+                            </div>
+                        </div>
+
+                        <div class="io-item">
+                            <div class="io-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Succesful_prints.png')}}" alt="Successful Prints">
+                            </div>
+
+                            <div class="io-text">
+                                <p>Succesful Prints</p>
+                                <h2>10</h2>
+                            </div>
+                        </div>
+
+                        <div class="io-item">
+                            <div class="io-icon">
+                                <img src="{{ url_for('static', filename='assets/icons/Failed_prints.png')}}" alt="Failed Prints">
+                            </div>
+
+                            <div class="io-text">
+                                <p>Failed Prints</p>
+                                <h2>2</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <img src="{{ url_for('static', filename='assets/Stars.png') }}" alt="Star decoration" class="decor-stars">
+        </div>
+    </body>
+
+        <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</html>
