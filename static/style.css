@@ -163,7 +163,7 @@ body, html {
     position: absolute;
     pointer-events: none;
     user-select: none;
-    z-index: 999;
+    z-index: 100;
 }
 
 .decor-heart {
@@ -386,16 +386,35 @@ body, html {
 }
 
 .algorithm span {
+    position: relative;
     font-family: var(--font-sub);
     font-size: 12px;
     color: var(--text-white);
-    background-color: var(--light-brown);
-    padding: 4px 8px;
-    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.2s ease;
 }
 
-.algorithm span:nth-child(2) {
-    background-color: rgba(0, 0, 0, 0.3);
+.algorithm span:hover {
+    transform: translateY(-1px);
+}
+
+.algorithm span.active {
+    background-color: var(--light-brown);
+    color: var(--text-primary);
+    animation: algorithmSelect 0.3s ease;
+}
+
+.algorithm span.active::before {
+    content: '✔';
+    position: absolute;
+    left: -1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-brown);
+    font-weight: 700;
 }
 
 .algorithm input {
@@ -406,6 +425,30 @@ body, html {
     color: var(--text-secondary);
     font-family: var(--font-sub);
     font-size: 12px;
+}
+
+@keyframes algorithmSelect {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.process-row.running {
+    background-color: rgba(253, 212, 150, 0.5);
+    transition: background-color 0.3s ease;
+}
+
+.process-row.waiting {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.process-row.finished {
+    background-color: rgba(165, 87, 48, 0.15);
 }
 
 .process-controls {
@@ -454,6 +497,7 @@ body, html {
 /* Process Visualization */
 .process-visualization {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
 
@@ -477,6 +521,17 @@ body, html {
     margin-bottom: 1em;
 
     min-height: 160px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;
+    position: relative;
+}
+
+.gantt-chart {
+    min-width: 0;
 }
 
 .add-process-btn {
@@ -897,4 +952,135 @@ body, html {
     font-size: 32px;
     color: var(--text-white);
     font-weight: 700;
+}
+
+.table-data {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    margin: 1em 0;
+}
+
+.process-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 130px;
+    gap: 1em;
+    align-items: center;
+    padding: 1em;
+    border-radius: 20px;
+    background-color: rgba(245, 236, 223, 0.9);
+    border: 1px solid rgba(165, 87, 48, 0.16);
+}
+
+.process-row p {
+    margin: 0;
+    font-family: var(--font-sub);
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.process-state {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.65em 0.9em;
+    border-radius: 999px;
+    background-color: var(--navy-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.process-empty {
+    font-family: var(--font-sub);
+    color: var(--text-secondary);
+    padding: 1em;
+    border-radius: 16px;
+    background: rgba(246, 244, 241, 0.9);
+}
+
+.process-popup.hidden {
+    display: none;
+}
+
+.process-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 1rem;
+}
+
+.process-popup-card {
+    width: min(520px, 100%);
+    background: var(--text-white);
+    border-radius: 30px;
+    padding: 2rem;
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.18);
+}
+
+.process-popup-card h3 {
+    margin: 0 0 1rem;
+    font-family: var(--font-main);
+    color: var(--dark-brown);
+}
+
+.process-popup-card label {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    color: var(--text-secondary);
+    font-family: var(--font-sub);
+    font-size: 14px;
+}
+
+.process-popup-card input {
+    width: 100%;
+    padding: 0.95em 1em;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #faf9f6;
+    font-family: var(--font-sub);
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.popup-actions button {
+    min-width: 120px;
+    padding: 0.85em 1.25em;
+    border-radius: 999px;
+    font-family: var(--font-sub);
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+#cancel-process {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+}
+
+#submit-process {
+    background: var(--brown);
+    color: #fff;
+}
+
+@media (max-width: 1000px) {
+    .process-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    .process-row p:last-child {
+        justify-self: start;
+    }
 }

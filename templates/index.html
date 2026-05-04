@@ -36,19 +36,15 @@
                     <ul>
                         <li><a href="#">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_1.png') }}" alt="Process Manager" class="nav-icon">
-                            <span class="overlay-text">Process Manager</span>
                         </a></li>
                         <li><a href="#">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_2.png') }}" alt="Memory Management" class="nav-icon">
-                            <span class="overlay-text">Memory Management</span>
                         </a></li>
                         <li><a href="#">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_3.png') }}" alt="File System" class="nav-icon">
-                            <span class="overlay-text">File System</span>
                         </a></li>
                         <li><a href="#">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_4.png') }}" alt="Input/Output Simulation" class="nav-icon">
-                            <span class="overlay-text">I/O Simulation</span>
                         </a></li>
                     </ul>
                 </div>
@@ -62,7 +58,7 @@
                 <div class="header">
                     <div class="header-text">
                         <h1>Hello! Welcome</h1>
-                        <p>April 14, 2026 | Tuesday</p>
+                        <p>{{ current_date }}</p>
                     </div>
 
                     <div class="picture-icon">
@@ -76,7 +72,7 @@
                         <img src="{{ url_for('static', filename='assets/icons/CPU_load.png')}}" alt="CPU Load" class="stat-icon">
                         <div class="stat-info">
                             <p>CPU Load</p>
-                            <h2>10%</h2>
+                            <h2>98%</h2>
                         </div>
                     </div>
 
@@ -84,7 +80,7 @@
                         <img src="{{ url_for('static', filename='assets/icons/Memory.png')}}" alt="Memory Usage" class="stat-icon">
                         <div class="stat-info">
                             <p>Memory Usage</p>
-                            <h2>10%</h2>
+                            <h2>75%</h2>
                         </div>
                     </div>
 
@@ -92,7 +88,7 @@
                         <img src="{{ url_for('static', filename='assets/icons/Active_jobs.png')}}" alt="Active Jobs" class="stat-icon">
                         <div class="stat-info">
                             <p>Active Jobs</p>
-                            <h2>0</h2>
+                            <h2>12</h2>
                         </div>
                     </div>
                 </div>
@@ -105,29 +101,49 @@
                             <p>Process Manager</p>
                         </div>
 
-                        <div class="table-label header">
+                        <div class="table-label">
                             <p>PID</p>
                             <p>Name</p>
-                            <p>Priority</p>
+                            <p>Burst Time</p>
                             <p>Current State</p>
                         </div>
-
                         <hr>
 
-                        <div id="process-container"></div>
+                        <div class="table-data"></div>
+
+                        <div id="process-popup" class="process-popup hidden">
+                            <div class="process-popup-card">
+                                <h3>Add New Process</h3>
+                                <label for="process-name">Process Name</label>
+                                <input id="process-name" type="text" placeholder="Enter process name">
+
+                                <label for="process-burst">Burst Time (ms)</label>
+                                <input id="process-burst" type="number" min="1" placeholder="Enter burst time">
+
+                                <label for="process-memory">Memory Size (MB)</label>
+                                <input id="process-memory" type="number" min="1" placeholder="Enter memory size">
+
+                                <div class="popup-actions">
+                                    <button type="button" id="cancel-process">Cancel</button>
+                                    <button type="button" id="submit-process">Add Process</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        
 
                         <div class="algorithm">
-                            <span>FCFS</span>
-                            <span>Round Robin</span>
-                            <input type="text" placeholder="Time Quantum (ms)" class="time-quantum-input">
+                            <span data-algo="FCFS" class="active">FCFS</span>
+                            <span data-algo="RR">Round Robin</span>
+                            <input type="number" min="1" placeholder="Time Quantum (ms)" class="time-quantum-input" value="50">
                         </div>
 
                         <div class="process-controls">
-                            <button class="control-button ">
-                                <img src="{{ url_for('static', filename='assets/icons/play.png')}}" alt="Add Process">
+                            <button id="start-simulation" class="control-button" title="Start simulation">
+                                <img src="{{ url_for('static', filename='assets/icons/play.png')}}" alt="Start Simulation">
                             </button>
-
-                            <button class="control-button">
+                            
+                            <button id="reset-processes" class="control-button" title="Reset processes">
                                 <img src="{{ url_for('static', filename='assets/icons/Reset.png')}}" alt="Reset Process">
                             </button>
                         </div>
@@ -144,7 +160,7 @@
                             <p>Gantt Chart</p>
 
                             <div class="gantt-chart-container">
-
+ 
                             </div>
                         </div>
 
@@ -157,62 +173,11 @@
                             </div>
                         </div>
 
-                        <button class="add-process-btn" onclick="addRandomProcess()">
+                        <button class="add-process-btn">
                             <img src="{{ url_for('static', filename='assets/icons/Add_process.png')}}" alt="Add Process">
                             <p>Add Process</p>
                         </button>
 
-                        
-                        <script>
-                        function updateStats() {
-                            const processes = document.querySelectorAll("#process-container .table-label");
-                            const total = processes.length;
-
-                            // CPU Load = % of processes in "Running"
-                            let runningCount = 0;
-                            processes.forEach(row => {
-                                const state = row.querySelector("p:last-child").textContent;
-                                if (state === "Running") runningCount++;
-                            });
-                            const cpuLoad = total ? Math.round((runningCount / total) * 100) : 0;
-
-                            // Memory Usage = demo calculation (sum of priorities capped at 100)
-                            let memoryUsage = 0;
-                            processes.forEach(row => {
-                                const priority = parseInt(row.querySelector("p:nth-child(3)").textContent, 10);
-                                memoryUsage += priority;
-                            });
-                            memoryUsage = Math.min(100, memoryUsage);
-
-                            // Active Jobs = total processes
-                            const activeJobs = total;
-
-                            // Update the stat cards
-                            document.querySelector(".stat:nth-child(1) h2").textContent = cpuLoad + "%";
-                            document.querySelector(".stat:nth-child(2) h2").textContent = memoryUsage + "%";
-                            document.querySelector(".stat:nth-child(3) h2").textContent = activeJobs;
-                        }
-
-                        // Call updateStats whenever a process is added
-                        function addRandomProcess() {
-                            const pid = Math.floor(Math.random() * 100);
-                            const names = ["Chrom","VSCod","Pyton","Nodes","Gamee","Cathy","Paine","Slake"];
-                            const name = names[Math.floor(Math.random() * names.length)];
-                            const priority = Math.floor(Math.random() * 10) + 1;
-                            const states = ["Ready","Running","Waiting"];
-                            const state = states[Math.floor(Math.random() * states.length)];
-
-                            const row = document.createElement("div");
-                            row.classList.add("table-label");
-                            row.innerHTML = `<p>${pid}</p><p>${name}</p><p>${priority}</p><p>${state}</p>`;
-                            document.getElementById("process-container").appendChild(row);
-
-                            updateStats();
-                        }
-                        </script>
-
-
-                        
                     </div>
                 </div>
 
@@ -260,7 +225,11 @@
 
                 <div class="memory-management">
                     <div class="memory-table">
+                        <div class="memory-heat-map">
+
+                        </div>
                         <div class="heart-icon">
+
                             <img src="{{ url_for('static', filename='assets/icons/Heart_outline.png')}}" alt="Heart Outline">
                         </div>
                     </div>
@@ -273,7 +242,7 @@
                             
                             <div class="memory-text">
                                 <p>In Use (Compressed)</p>
-                                <h2>16 GB</h2>
+                                <h2 id="memory-used">16 GB</h2>
                             </div>
                         </div>
 
@@ -283,7 +252,7 @@
                             </div>
                             <div class="memory-text">
                                 <p>Available Space</p>
-                                <h2>2 GB</h2>
+                                <h2 id="memory-available">2 GB</h2>
                             </div>
                         </div>
 
@@ -410,5 +379,5 @@
     </body>
 
         <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </html>
