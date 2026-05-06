@@ -57,6 +57,7 @@ body, html {
     height: 100%;
     background-color: var(--beige);
     color: var(--text-primary);
+    scroll-behavior: smooth;
 
     display: flex;
     justify-content: center;
@@ -124,13 +125,13 @@ body, html {
   bottom: 100%; /* places text above the icon */
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.5);
   color: #fff;
   font-size: 12px; /* smaller font size */
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
   opacity: 0; /* hidden by default */
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   white-space: nowrap;
   pointer-events: none; /* ensures hover stays on the icon */
 }
@@ -768,14 +769,83 @@ body, html {
 .file-table {
     z-index: 1;
     flex: 1;
-    background-color: var(--text-white);
+    background: linear-gradient(180deg, rgba(250, 248, 245, 0.98), rgba(244, 241, 236, 0.98));
+    border: 1px solid rgba(156, 132, 111, 0.16);
     border-radius: 30px;
     padding: 1.5em;
-    box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 14px 40px rgba(147, 120, 93, 0.12);
     min-height: 560px;
     width: 95%;
     position: relative;
 }
+
+.file-table .table-label {
+  display: grid;
+  grid-template-columns: 40px minmax(180px, 1fr) 180px 100px 80px 40px;
+  align-items: center;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.file-table .table-label p:first-child,
+.file-table .table-label p:last-child {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* File System Rows */
+.file-table .file-row {
+  display: grid;
+  grid-template-columns: 40px minmax(180px, 1fr) 180px 100px 80px 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(156, 132, 111, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.file-table .file-row:nth-child(even) {
+  background: rgba(248, 244, 238, 0.8);
+}
+
+.file-table .file-row:last-child {
+  border-bottom: none;
+}
+
+.file-table .file-row input[type="checkbox"] {
+  justify-self: center;
+  width: 16px;
+  height: 16px;
+}
+
+.file-table .file-row .file-name,
+.file-table .file-row .file-date,
+.file-table .file-row .file-type,
+.file-table .file-row .file-size {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-table .file-row .edit-btn {
+  justify-self: end;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background-color: var(--pastel-yellow);
+  color: var(--text-primary);
+  font-family: var(--font-sub);
+  font-weight: 700;
+}
+
+.file-table .file-row .edit-btn:hover {
+  background-color: hsl(40, 90%, 75%);
+}
+
 
 .file-controls {
     position: absolute;
@@ -838,13 +908,66 @@ body, html {
 .io-table {
     z-index: 1;
     flex: 1;
-    background-color: var(--text-white);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 247, 250, 0.98));
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 30px;
     padding: 1.5em;
-    box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.08);
     min-height: 560px;
     position: relative;
     overflow: visible;
+}
+
+.io-table .table-label {
+    display: grid;
+    grid-template-columns: 2.5fr 1.25fr 1.5fr 0.9fr;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.io-table .table-label p {
+    margin: 0;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.io-table .print-row p {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.io-table .print-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1.25fr 1.5fr 0.9fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.9rem 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.io-table .print-row:last-child {
+    border-bottom: none;
+}
+
+.io-table hr {
+    margin: 0 0 1rem 0;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.io-table .print-row:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 18px;
+}
+
+.io-table .print-row:nth-child(even) {
+    background: rgba(244, 245, 248, 0.85);
+    border-radius: 18px;
 }
 
 .io-controls{
@@ -1006,15 +1129,17 @@ body, html {
 .process-popup {
     position: fixed;
     inset: 0;
-    z-index: 999;
+    z-index: 10001;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.6);
     padding: 1rem;
 }
 
 .process-popup-card {
+    position: relative;
+    z-index: 10002;
     width: min(520px, 100%);
     background: var(--text-white);
     border-radius: 30px;
@@ -1036,7 +1161,8 @@ body, html {
     font-size: 14px;
 }
 
-.process-popup-card input {
+.process-popup-card input,
+.process-popup-card textarea {
     width: 100%;
     padding: 0.95em 1em;
     border-radius: 18px;
@@ -1045,6 +1171,17 @@ body, html {
     font-family: var(--font-sub);
     font-size: 14px;
     color: var(--text-primary);
+}
+
+.process-popup-card textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+.process-popup-card .fixed-file-type {
+    margin: 0.75rem 0 0;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .popup-actions {
@@ -1074,6 +1211,27 @@ body, html {
     color: #fff;
 }
 
+#cancel-file {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+}
+
+#submit-file {
+    background: var(--brown);
+    color: #fff;
+}
+
+#cancel-delete-file {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+}
+
+#confirm-delete-file {
+    background: var(--red);
+    color: #fff;
+}
+
+
 @media (max-width: 1000px) {
     .process-row {
         grid-template-columns: 1fr;
@@ -1083,4 +1241,17 @@ body, html {
     .process-row p:last-child {
         justify-self: start;
     }
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #A55730;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-family: Poppins, sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999; /* this is to ensures it's on top */
 }
