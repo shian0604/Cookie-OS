@@ -34,17 +34,21 @@
                 <!-- Navigation -->
                 <div class="navigation">
                     <ul>
-                        <li><a href="#">
+                        <li><a href="#process-manager">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_1.png') }}" alt="Process Manager" class="nav-icon">
+                            <span class="overlay-text">Process Manager</span>
                         </a></li>
-                        <li><a href="#">
+                        <li><a href="#memory-management">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_2.png') }}" alt="Memory Management" class="nav-icon">
+                            <span class="overlay-text">Memory Management</span>
                         </a></li>
-                        <li><a href="#">
+                        <li><a href="#file-system">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_3.png') }}" alt="File System" class="nav-icon">
+                            <span class="overlay-text">File System</span>
                         </a></li>
-                        <li><a href="#">
+                        <li><a href="#io-simulation">
                             <img src="{{ url_for('static', filename='assets/icons/sidebar_4.png') }}" alt="Input/Output Simulation" class="nav-icon">
+                            <span class="overlay-text">Input/Output Simulation</span>
                         </a></li>
                     </ul>
                 </div>
@@ -94,7 +98,7 @@
                 </div>
 
                 <!--Process Manager-->
-                <div class="process-manager">
+                <div id="process-manager" class="process-manager">
                     <div class="process-table">
                         <div class="icon-text">
                             <img src="{{ url_for('static', filename='assets/icons/Process_manager.png')}}" alt="Process Manager">
@@ -218,7 +222,7 @@
 
 
                 <!--Memory Management-->
-                <div class="icon-text">
+                <div class="icon-text" id="memory-management">
                     <img src="{{ url_for('static', filename='assets/icons/CPU_scheduler.png')}}" alt="Memory Management">
                     <p>Memory Management</p>
                 </div>
@@ -271,32 +275,45 @@
                 </div>
 
                 <!--File System-->
-                <div class="icon-text">
+                <div class="icon-text" id="file-system">
                     <img src="{{ url_for('static', filename='assets/icons/File_system.png')}}" alt="File System">
                     <p>File System</p>
                 </div>
 
                 <div class="file-system">
                     <div class="file-table">
+
+                        <!-- Table Header -->
                         <div class="table-label">
+                            <p></p>
                             <p>Name</p>
                             <p>Date Modified</p>
                             <p>Type</p>
                             <p>Size</p>
+                            <p></p>
                         </div>
 
                         <hr>
 
+                        <!-- File Rows (dynamic content goes here) -->
+                        <div class="file-rows">
+                            <!-- Example row for reference -->
+                            <div class="file-row">
+                                
+                            </div>
+                        </div>
+
+                        <!-- File Controls (your original code preserved) -->
                         <div class="file-controls">
-                            <button class="file-ctrl-button">
+                            <button class="file-ctrl-button" id="add-file">
                                 <img src="{{ url_for('static', filename='assets/icons/Add_file.png')}}" alt="Add File">
                             </button>
 
-                            <button class="file-ctrl-button">
+                            <button class="file-ctrl-button" id="remove-file">
                                 <img src="{{ url_for('static', filename='assets/icons/Remove_file.png')}}" alt="Remove File">
                             </button>
                             
-                            <button class="file-ctrl-button">
+                            <button class="file-ctrl-button" id="print-file">
                                 <img src="{{ url_for('static', filename='assets/icons/Print_file.png')}}" alt="Print File">
                             </button>
                         </div>
@@ -304,8 +321,9 @@
                     </div>
                 </div>
 
+
                 <!--Input/Output Simulation-->
-                <div class="icon-text">
+                <div class="icon-text" id="io-simulation">
                     <img src="{{ url_for('static', filename='assets/icons/Input_output.png')}}" alt="Input/Output Simulation">
                     <p>Input/Output Simulation</p>
                 </div>
@@ -317,17 +335,18 @@
                             <p>Spooling</p>
                             <p>Status</p>
                             <p>Queue Length</p>
+                            <p>Remaining</p>
                         </div>
 
                         <hr>
 
                         <div class="io-controls">
                             <button class="io-ctrl-button">
-                                <img src="{{ url_for('static', filename='assets/icons/Pause.png')}}" alt="Start Spooling">
+                                <img src="{{ url_for('static', filename='assets/icons/Pause.png')}}" alt="Pause Spooling">
                             </button>
 
                             <button class="io-ctrl-button">
-                                <img src="{{ url_for('static', filename='assets/icons/Play.png')}}" alt="Stop Spooling">
+                                <img src="{{ url_for('static', filename='assets/icons/Play.png')}}" alt="Play Spooling">
                             </button>
                             
                             <button class="io-ctrl-button">
@@ -355,7 +374,7 @@
 
                             <div class="io-text">
                                 <p>Succesful Prints</p>
-                                <h2>10</h2>
+                                <h2>0</h2>
                             </div>
                         </div>
 
@@ -366,7 +385,7 @@
 
                             <div class="io-text">
                                 <p>Failed Prints</p>
-                                <h2>2</h2>
+                                <h2>0</h2>
                             </div>
                         </div>
                     </div>
@@ -375,6 +394,36 @@
             </div>
 
             <img src="{{ url_for('static', filename='assets/Stars.png') }}" alt="Star decoration" class="decor-stars">
+        </div>
+
+        <div id="file-popup" class="process-popup hidden">
+            <div class="process-popup-card">
+                <h3 id="file-popup-title">Add File</h3>
+
+                <label for="file-name">File Name</label>
+                <input type="text" id="file-name" placeholder="Enter file name">
+
+                <label for="file-content">Document Content</label>
+                <textarea id="file-content" placeholder="Type your document here..." rows="6"></textarea>
+
+                <p class="fixed-file-type">File Type: <strong>DOCX</strong></p>
+
+                <div class="popup-actions">
+                    <button id="cancel-file">Cancel</button>
+                    <button id="submit-file">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="file-delete-confirmation" class="process-popup hidden">
+            <div class="process-popup-card">
+                <h3>Confirm Delete</h3>
+                <p class="confirm-message">Are you sure you want to delete the selected file(s)? This action cannot be undone.</p>
+                <div class="popup-actions">
+                    <button id="cancel-delete-file">Cancel</button>
+                    <button id="confirm-delete-file">Delete</button>
+                </div>
+            </div>
         </div>
     </body>
 
