@@ -12,6 +12,177 @@ document.addEventListener('DOMContentLoaded', () => {
     const algorithmSpans = document.querySelectorAll('.algorithm span');
     const timeQuantumInput = document.querySelector('.time-quantum-input');
 
+    //File System Part
+    const addBtn = document.getElementById("add-file");
+    const removeBtn = document.getElementById("remove-file");
+    const printBtn = document.getElementById("print-file");
+    const fileRowsContainer = document.querySelector(".file-rows");
+    const filePopup = document.getElementById("file-popup");
+    const filePopupTitle = document.getElementById("file-popup-title");
+    const fileNameInput = document.getElementById("file-name");
+    const fileContentInput = document.getElementById("file-content");
+    const cancelFileBtn = document.getElementById("cancel-file");
+    const submitFileBtn = document.getElementById("submit-file");
+    const fileDeleteConfirmation = document.getElementById('file-delete-confirmation');
+    const cancelDeleteFileBtn = document.getElementById('cancel-delete-file');
+    const confirmDeleteFileBtn = document.getElementById('confirm-delete-file');
+    const deleteConfirmMessage = document.querySelector('.confirm-message');
+
+    //IO Simulation Part
+    // === I/O Simulation Part ===
+    const playBtn = document.querySelector('.io-controls .io-ctrl-button:nth-child(2)'); // Play
+    const pauseBtn = document.querySelector('.io-controls .io-ctrl-button:nth-child(1)'); // Pause
+    const resetBtn = document.querySelector('.io-controls .io-ctrl-button:nth-child(3)'); // Reset
+
+    const printerStatusEl = document.querySelector('.io-item:nth-child(1) h2');
+    const successfulPrintsEl = document.querySelector('.io-item:nth-child(2) h2');
+    const failedPrintsEl = document.querySelector('.io-item:nth-child(3) h2');
+
+    const navLinks = document.querySelectorAll('.navigation a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const targetId = link.getAttribute('href').slice(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Part parin ng file system to 
+    // Add File
+    addBtn.addEventListener("click", () => {
+        editingRow = null;
+        filePopupTitle.textContent = "Add File";
+        fileNameInput.value = "";
+        fileContentInput.value = "";
+        filePopup.classList.remove("hidden");
+        });
+
+        // Cancel
+        cancelFileBtn.addEventListener("click", () => {
+        filePopup.classList.add("hidden");
+        });
+
+        // Save
+        submitFileBtn.addEventListener("click", () => {
+        const name = fileNameInput.value.trim();
+        const content = fileContentInput.value.trim();
+        const type = 'DOCX';
+
+        if (name && content) {
+            const date = new Date().toLocaleString();
+            const size = `${Math.max(1, Math.ceil(content.length / 80))} KB`;
+
+            if (editingRow) {
+            // Update existing row
+            editingRow.querySelector(".file-name").textContent = name;
+            editingRow.querySelector(".file-date").textContent = date;
+            editingRow.querySelector(".file-type").textContent = type;
+            editingRow.querySelector(".file-size").textContent = size;
+            editingRow.dataset.fileContent = content;
+            } else {
+            // Create new row
+            const row = document.createElement("div");
+            row.classList.add("file-row");
+            row.dataset.fileContent = content;
+            row.innerHTML = `
+                <input type="checkbox" class="file-select">
+                <span class="file-name">${name}</span>
+                <span class="file-date">${date}</span>
+                <span class="file-type">${type}</span>
+                <span class="file-size">${size}</span>
+                <button class="edit-btn">Edit</button>
+            `;
+            fileRowsContainer.appendChild(row);
+
+            // Edit button logic
+            row.querySelector(".edit-btn").addEventListener("click", () => {
+                editingRow = row;
+                filePopupTitle.textContent = "Edit File";
+                fileNameInput.value = row.querySelector(".file-name").textContent;
+                fileContentInput.value = row.dataset.fileContent || "";
+                filePopup.classList.remove("hidden");
+            });
+            }
+            filePopup.classList.add("hidden");
+        }
+    });
+
+    function getSelectedFileRows() {
+        return Array.from(fileRowsContainer.querySelectorAll('.file-row')).filter(row => {
+            const checkbox = row.querySelector('.file-select');
+            return checkbox && checkbox.checked;
+        });
+    }
+
+    let pendingDeleteRows = [];
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.remove();
+        }, 2800);
+    }
+
+    function openDeleteConfirmation(selectedRows) {
+        pendingDeleteRows = selectedRows;
+        deleteConfirmMessage.textContent = `Delete ${selectedRows.length} selected file(s)? This action cannot be undone.`;
+        fileDeleteConfirmation.classList.remove('hidden');
+    }
+
+    function closeDeleteConfirmation() {
+        pendingDeleteRows = [];
+        fileDeleteConfirmation.classList.add('hidden');
+    }
+
+    function removeSelectedFiles() {
+        const selectedRows = getSelectedFileRows();
+        if (selectedRows.length === 0) {
+            showNotification('Please select at least one file to delete.');
+            return;
+        }
+
+        openDeleteConfirmation(selectedRows);
+    }
+
+    cancelDeleteFileBtn.addEventListener('click', () => {
+        closeDeleteConfirmation();
+    });
+
+    confirmDeleteFileBtn.addEventListener('click', () => {
+        pendingDeleteRows.forEach(row => row.remove());
+        closeDeleteConfirmation();
+        showNotification('Selected file(s) deleted successfully.');
+    });
+
+    function printSelectedFiles() {
+        const selectedRows = getSelectedFileRows();
+        if (selectedRows.length === 0) {
+            showNotification('Please select at least one file to send to the I/O simulation.');
+            return;
+        }
+
+        selectedRows.forEach(row => {
+            const fileName = row.querySelector('.file-name')?.textContent?.trim();
+            if (fileName) {
+                addToPrintQueue(fileName);
+            }
+            const checkbox = row.querySelector('.file-select');
+            if (checkbox) checkbox.checked = false;
+        });
+
+        if (!isPrinting) {
+            processQueue();
+        }
+
+        showNotification(`${selectedRows.length} file(s) queued for I/O simulation.`);
+    }
+
     let selectedAlgorithm = 'FCFS';
     let currentProcesses = [];
     let isSimulating = false;
@@ -26,6 +197,97 @@ document.addEventListener('DOMContentLoaded', () => {
         { size: 256, allocated: false, process: null },
         { size: 256, allocated: false, process: null }
     ];
+
+    //File System Popup
+    let editingRow = null;
+
+    //IO Simulation Variables
+    let printQueue = [];
+    let isPrinting = false;
+    let isPaused = false;
+    let successfulPrints = 0;
+    let failedPrints = 0;
+
+    // IO Part para sa add files
+    function addToPrintQueue(fileName) {
+        const duration = Math.floor(Math.random() * 16) + 5; // 5–20s
+        const queueItem = {
+            name: fileName,
+            status: 'Ready',
+            queueNumber: printQueue.length + 1,
+            duration: duration,
+            remaining: duration
+        };
+        printQueue.push(queueItem);
+        renderPrintQueue();
+    }
+
+    // IO Part for Render Print Queue Table
+    function renderPrintQueue() {
+        const table = document.querySelector('.io-table');
+        table.querySelectorAll('.print-row').forEach(row => row.remove());
+
+        printQueue.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'print-row';
+            row.innerHTML = `
+                <p>${item.name}</p>
+                <p>${item.status}</p>
+                <p>${item.queueNumber}</p>
+                <p>${item.remaining}s</p>
+            `;
+            if (item.status === 'Failed') {
+                const fixBtn = document.createElement('button');
+                fixBtn.textContent = 'Fix';
+                fixBtn.addEventListener('click', () => {
+                    item.status = 'Ready';
+                    item.remaining = item.duration;
+                    printQueue.push(item);
+                    renderPrintQueue();
+                });
+                row.appendChild(fixBtn);
+            }
+            table.appendChild(row);
+        });
+    }
+
+    // Simulation Loop
+    async function processQueue() {
+        if (isPrinting || isPaused) return;
+        isPrinting = true;
+
+        while (printQueue.length > 0 && !isPaused) {
+            const current = printQueue[0];
+            current.status = 'Printing';
+            printerStatusEl.textContent = 'Unavailable';
+            renderPrintQueue();
+
+            while (current.remaining > 0 && !isPaused) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                current.remaining -= 1;
+                renderPrintQueue();
+            }
+
+            if (!isPaused) {
+                if (Math.random() < 0.4) {
+                    current.status = 'Failed';
+                    failedPrints++;
+                    failedPrintsEl.textContent = failedPrints;
+                } else {
+                    current.status = 'Finished';
+                    successfulPrints++;
+                    successfulPrintsEl.textContent = successfulPrints;
+                }
+                printQueue.shift();
+                printerStatusEl.textContent = 'Available';
+                renderPrintQueue();
+            }
+        }
+
+        isPrinting = false;
+    }
+
+
 
     function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
@@ -743,11 +1005,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    playBtn.addEventListener('click', () => {
+        isPaused = false;
+        processQueue();
+    });
+
+    pauseBtn.addEventListener('click', () => {
+        isPaused = true;
+        printerStatusEl.textContent = 'Paused';
+    });
+
+    resetBtn.addEventListener('click', () => {
+        printQueue = [];
+        successfulPrints = 0;
+        failedPrints = 0;
+        printerStatusEl.textContent = 'Available';
+        successfulPrintsEl.textContent = successfulPrints;
+        failedPrintsEl.textContent = failedPrints;
+        renderPrintQueue();
+    });
+
     addProcessButton.addEventListener('click', openPopup);
     cancelButton.addEventListener('click', closePopup);
     submitButton.addEventListener('click', submitProcess);
     startSimulationButton.addEventListener('click', startSimulation);
     resetProcessesButton.addEventListener('click', resetProcesses);
+    removeBtn.addEventListener('click', removeSelectedFiles);
+    printBtn.addEventListener('click', printSelectedFiles);
 
     algorithmSpans.forEach((span) => {
         span.addEventListener('click', () => {
