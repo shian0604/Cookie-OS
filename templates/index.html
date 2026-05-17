@@ -6,6 +6,10 @@
         <title>Cookie OS | Main Interface</title>
 
         <!-- CSS -->
+         <link rel="preload"
+            href="{{ url_for('static', filename='assets/Cookie.json') }}"
+            as="fetch"
+            crossorigin="anonymous">
 
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
@@ -16,10 +20,16 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,80₀;1,9₀&display=swap" rel="stylesheet">
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js" integrity="sha512-/2iDB6A9J9arlC5nGz0BiNe1sK44IGZP2ey0eVYedgTISu1A75J5aAPzfzDzWkY1C0wd2SREY0kS7q/2Hf1jXw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
 
     <body>
+        <div id="page-loader">
+            <div class="loader-wrapper">
+                <div id="loader-animation"></div>
+            </div>
+        </div>
+
         <!-- Main Container -->
         <div class="main-container">
             <img src="{{ url_for('static', filename='assets/Heart.png') }}" alt="Heart decoration" class="decor-heart">
@@ -66,7 +76,7 @@
                     </div>
 
                     <div class="picture-icon">
-
+                        <img src="{{ url_for('static', filename='assets/profile.jpg') }}" alt="User Icon">
                     </div>
                 </div>
 
@@ -113,7 +123,9 @@
                         </div>
                         <hr>
 
-                        <div class="table-data"></div>
+                        <div class="table-data">
+                            
+                        </div>
 
                         <div id="process-popup" class="process-popup hidden">
                             <div class="process-popup-card">
@@ -262,12 +274,12 @@
 
                         <div class="memory-item">
                             <div class="memory-icon">
-                                <img src="{{ url_for('static', filename='assets/icons/Speed.png')}}" alt="Speed">
+                                <img src="{{ url_for('static', filename='assets/icons/Speed.png')}}" alt="Allocation Speed">
                             </div>
 
                             <div class="memory-text">
-                                <p>Speed</p>
-                                <h2>3200 MT/s</h2>
+                                <p>Allocation Speed</p>
+                                <h2 id="memory-speed">0 MB/s</h2>
                             </div>
                         </div>
                     </div>
@@ -428,5 +440,47 @@
     </body>
 
         <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const loader = document.getElementById("page-loader");
+            const animationContainer = document.getElementById("loader-animation");
+
+            // Hide animation container initially
+            animationContainer.style.opacity = "0";
+
+            const animation = lottie.loadAnimation({
+                container: animationContainer,
+                renderer: "svg",
+                loop: true,
+                autoplay: true,
+                path: "{{ url_for('static', filename='assets/Cookie.json') }}"
+            });
+
+            // Show animation only after fully loaded
+            animation.addEventListener("DOMLoaded", () => {
+
+                animationContainer.style.transition = "opacity 0.2s ease";
+                animationContainer.style.opacity = "1";
+
+                // Remove loader after page fully loads
+                window.addEventListener("load", () => {
+
+                    setTimeout(() => {
+                        loader.style.opacity = "0";
+
+                        setTimeout(() => {
+                            loader.remove();
+                        }, 400);
+
+                    }, 1500);
+
+                });
+
+            });
+
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </html>

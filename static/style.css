@@ -210,13 +210,12 @@ body, html {
     justify-content: space-between;
 }
 
-.picture-icon {
+.picture-icon, .picture-icon img {
     width: 36px;
     height: 36px;
-
-    background-color: rgb(217, 217, 217);
     border-radius: 50%;
 }
+
 
 .header-text h1 {
     font-family: var(--font-main);
@@ -306,7 +305,7 @@ body, html {
     border-radius: 30px;
     padding: 1.5em;
     box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
-    min-height: 560px;
+    max-height: 560px;
     flex: 1;
     position: relative;
 }
@@ -388,6 +387,9 @@ body, html {
 
 .algorithm span {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
     font-family: var(--font-sub);
     font-size: 12px;
     color: var(--text-white);
@@ -395,27 +397,40 @@ body, html {
     padding: 6px 12px;
     border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.25s ease, transform 0.2s ease;
+    transition: background-color 0.25s ease, transform 0.2s ease, padding 0.25s ease;
+    white-space: nowrap;
 }
 
 .algorithm span:hover {
     transform: translateY(-1px);
 }
 
+.algorithm span::before {
+    content: '✔';
+    display: inline-block;
+    opacity: 0;
+    transform: translateX(-6px) scale(0.8);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    color: var(--dark-brown);
+    font-weight: 700;
+    margin-right: 0;
+    width: 0;
+    overflow: hidden;
+}
+
 .algorithm span.active {
     background-color: var(--light-brown);
     color: var(--text-primary);
     animation: algorithmSelect 0.3s ease;
+    padding-left: 14px;
+    padding-right: 18px;
 }
 
 .algorithm span.active::before {
-    content: '✔';
-    position: absolute;
-    left: -1.2em;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--dark-brown);
-    font-weight: 700;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    margin-right: 0.35em;
+    width: auto;
 }
 
 .algorithm input {
@@ -769,11 +784,11 @@ body, html {
 .file-table {
     z-index: 1;
     flex: 1;
-    background: linear-gradient(180deg, rgba(250, 248, 245, 0.98), rgba(244, 241, 236, 0.98));
+    background: var(--text-white);
     border: 1px solid rgba(156, 132, 111, 0.16);
     border-radius: 30px;
     padding: 1.5em;
-    box-shadow: 0px 14px 40px rgba(147, 120, 93, 0.12);
+    box-shadow: 0px 14px 40px rgba(213, 156, 111, 0.1);
     min-height: 560px;
     width: 95%;
     position: relative;
@@ -785,11 +800,9 @@ body, html {
   align-items: center;
   font-weight: 700;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   margin-bottom: 8px;
   padding: 10px 14px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .file-table .table-label p:first-child,
@@ -806,11 +819,15 @@ body, html {
   gap: 12px;
   padding: 10px 14px;
   border-bottom: 1px solid rgba(156, 132, 111, 0.12);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .file-table .file-row:nth-child(even) {
-  background: rgba(248, 244, 238, 0.8);
+    background: rgba(244, 245, 248, 0.85);
+}
+
+.file-row {
+    border-radius: 5px;
 }
 
 .file-table .file-row:last-child {
@@ -821,6 +838,16 @@ body, html {
   justify-self: center;
   width: 16px;
   height: 16px;
+  appearance: none;
+  border-radius: 50%;
+  border: 2px solid var(--text-secondary);
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.file-table .file-row input[type="checkbox"]:checked {
+  background-color: var(--light-brown);
+  border-color: var(--light-brown);
 }
 
 .file-table .file-row .file-name,
@@ -837,13 +864,13 @@ body, html {
   padding: 8px 10px;
   border-radius: 12px;
   background-color: var(--pastel-yellow);
-  color: var(--text-primary);
+  color: var(--text-white);
   font-family: var(--font-sub);
   font-weight: 700;
 }
 
 .file-table .file-row .edit-btn:hover {
-  background-color: hsl(40, 90%, 75%);
+  background-color: hsl(from var(--pastel-yellow) h s calc(l + 8));
 }
 
 
@@ -884,7 +911,7 @@ body, html {
     background-color: var(--navy-blue);
 }
 
-.file-ctrl-button:nth-child(1):hover {
+.file-ctrl-button:nth-child(2):hover {
     background-color: hsl(from var(--navy-blue) h s calc(l + 8));
 }
 
@@ -962,12 +989,12 @@ body, html {
 
 .io-table .print-row:nth-child(odd) {
     background: rgba(255, 255, 255, 0.85);
-    border-radius: 18px;
+    border-radius: 5px;
 }
 
 .io-table .print-row:nth-child(even) {
     background: rgba(244, 245, 248, 0.85);
-    border-radius: 18px;
+    border-radius: 5px;
 }
 
 .io-controls{
@@ -1080,8 +1107,16 @@ body, html {
 .table-data {
     display: flex;
     flex-direction: column;
-    gap: 0.75em;
     margin: 1em 0;
+    height: 360px;
+    overflow-y: auto;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.table-data::-webkit-scrollbar {
+    display: none;
 }
 
 .process-row {
@@ -1090,9 +1125,13 @@ body, html {
     gap: 1em;
     align-items: center;
     padding: 1em;
-    border-radius: 20px;
-    background-color: rgba(245, 236, 223, 0.9);
-    border: 1px solid rgba(165, 87, 48, 0.16);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 3px solid rgba(213, 156, 111, 0.1);
+}
+
+.process-row:last-child {
+    border-bottom: none;
 }
 
 .process-row p {
@@ -1119,7 +1158,7 @@ body, html {
     color: var(--text-secondary);
     padding: 1em;
     border-radius: 16px;
-    background: rgba(246, 244, 241, 0.9);
+    background: rgba(246, 244, 241, 0.2);
 }
 
 .process-popup.hidden {
@@ -1247,11 +1286,51 @@ body, html {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: #A55730;
+  background: var(--light-brown);
   color: #fff;
   padding: 10px 15px;
   border-radius: 6px;
   font-family: Poppins, sans-serif;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   z-index: 9999; /* this is to ensures it's on top */
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: notificationSlideIn 0.35s ease forwards;
+}
+
+@keyframes notificationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#page-loader {
+  position: fixed;
+  inset: 0;
+  background: #FFFFE8;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.35s ease;
+}
+
+#page-loader .loader-wrapper {
+  width: min(420px, 80%);
+  max-width: 420px;
+  height: min(420px, 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loader-animation {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 }

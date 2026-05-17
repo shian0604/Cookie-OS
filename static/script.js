@@ -191,11 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalCpuTime = 0;
     let totalSimulationTime = 0;
     let ganttTimeline = [];
+    let memoryAllocationHistory = [];
     let memoryPartitions = [
         { size: 256, allocated: false, process: null },
         { size: 256, allocated: false, process: null },
         { size: 256, allocated: false, process: null },
-        { size: 256, allocated: false, process: null }
+        { size: 256, allocated: false, process: null },
+        { size: 256, allocated: false, process: null },
+        { size: 256, allocated: false, process: null },
+        { size: 256, allocated: false, process: null },
+        { size: 256, allocated: false, process: null },
+        { size: 256, allocated: false, process: null },
     ];
 
     //File System Popup
@@ -293,11 +299,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    function allocateMemory(process) {
+    function allocateMemory(process, currentTime) {
         for (let i = 0; i < memoryPartitions.length; i++) {
             if (!memoryPartitions[i].allocated && memoryPartitions[i].size >= process.memory_size) {
                 memoryPartitions[i].allocated = true;
                 memoryPartitions[i].process = process;
+                memoryAllocationHistory.push({ size: process.memory_size, time: currentTime });
                 return true;
             }
         }
@@ -325,9 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
         memoryPartitions.forEach((partition, index) => {
             const partitionDiv = document.createElement('div');
             partitionDiv.className = 'memory-partition';
-            partitionDiv.style.width = '100px';
-            partitionDiv.style.height = '100px';
-            partitionDiv.style.border = '2px solid #ddd';
+            partitionDiv.style.width = '120px';
+            partitionDiv.style.height = '120px';
             partitionDiv.style.display = 'inline-flex';
             partitionDiv.style.flexDirection = 'column';
             partitionDiv.style.justifyContent = 'center';
@@ -341,12 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
             partitionDiv.style.whiteSpace = 'pre-line';
 
             if (partition.allocated) {
-                partitionDiv.style.backgroundColor = '#A55730';
+                partitionDiv.style.backgroundColor = '#5B5F7C';
                 partitionDiv.style.color = '#fff';
                 partitionDiv.textContent = `P${partition.process.pid}: ${partition.process.name}\n${partition.process.memory_size} MB`;
             } else {
                 partitionDiv.style.backgroundColor = '#FDD496';
-                partitionDiv.style.color = '#333';
+                partitionDiv.style.color = '#fff';
                 partitionDiv.textContent = `Free\n${partition.size} MB`;
             }
 
@@ -354,6 +360,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         updateMemoryStats();
+    }
+
+    function getMemoryAllocationSpeedText() {
+        if (!memoryAllocationHistory.length) {
+            return '0 MB/s';
+        }
+
+        const totalAllocated = memoryAllocationHistory.reduce((sum, event) => sum + event.size, 0);
+        const firstTime = memoryAllocationHistory[0].time;
+        const lastTime = memoryAllocationHistory[memoryAllocationHistory.length - 1].time;
+        const elapsedSeconds = Math.max(1, (lastTime - firstTime) / 1000);
+        const speed = totalAllocated / elapsedSeconds;
+
+        if (speed >= 1000) {
+            return `${(speed / 1000).toFixed(2)} GB/s`;
+        }
+        return `${Math.round(speed)} MB/s`;
     }
 
     function formatMemoryValue(valueMb) {
@@ -373,12 +396,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const usedEl = document.getElementById('memory-used');
         const freeEl = document.getElementById('memory-available');
+        const speedEl = document.getElementById('memory-speed');
 
         if (usedEl) {
             usedEl.textContent = formatMemoryValue(usedMemory);
         }
         if (freeEl) {
             freeEl.textContent = formatMemoryValue(freeMemory);
+        }
+        if (speedEl) {
+            speedEl.textContent = getMemoryAllocationSpeedText();
         }
     }
 
@@ -399,10 +426,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderProcesses(processes) {
-        currentProcesses = processes;
+        const normalized = (processes || []).map((proc) => ({
+            ...proc,
+            original_burst_time: proc.original_burst_time ?? proc.burst_time,
+            state: proc.state ?? 'Ready',
+        }));
+
+        currentProcesses = normalized;
         tableData.innerHTML = '';
 
-        if (!processes || processes.length === 0) {
+        if (!normalized.length) {
             const emptyState = document.createElement('p');
             emptyState.className = 'process-empty';
             emptyState.textContent = 'No processes added yet. Tap Add Process to begin.';
@@ -410,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        processes.forEach((process) => {
+        normalized.forEach((process) => {
             tableData.appendChild(createProcessRow(process));
         });
     }
@@ -474,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalTime = ganttTimeline[ganttTimeline.length - 1].end;
         const scale = Math.max(100, totalTime * 20) / totalTime;
-        const colors = ['#FDD496', '#D59C6F', '#A55730', '#5B5F7C', '#6F513A', '#C05741'];
+        const colors = ['#FDD496', '#A55730', '#5B5F7C',];
 
         // Apply layout styles directly to the container
         ganttContainer.style.display = 'flex';
@@ -509,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 font-size: 12px;
                 background: ${colors[slice.pid % colors.length]};
                 border-right: 1px solid rgba(0,0,0,0.1);
-                color: #333;
+                color: #fff;
             `;
             bar.textContent = slice.name;
             barRow.appendChild(bar);
@@ -568,6 +601,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const height = 200 - 2 * padding;
         const scaleX = (width - 2 * padding) / (waitingTimes.length - 1 || 1);
         const scaleY = height / (maxWaiting || 1);
+
+        // Draw grid background lines like graph paper
+        const gridLines = 8;
+        for (let i = 1; i < gridLines; i++) {
+            const x = padding + i * ((width - 2 * padding) / gridLines);
+            const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            gridLine.setAttribute('x1', x);
+            gridLine.setAttribute('y1', padding);
+            gridLine.setAttribute('x2', x);
+            gridLine.setAttribute('y2', height + padding);
+            gridLine.setAttribute('stroke', '#A55730');
+            gridLine.setAttribute('stroke-width', '0.5');
+            gridLine.setAttribute('opacity', '0.15');
+            svg.appendChild(gridLine);
+        }
+        for (let i = 1; i < gridLines; i++) {
+            const y = padding + i * (height / gridLines);
+            const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            gridLine.setAttribute('x1', padding);
+            gridLine.setAttribute('y1', y);
+            gridLine.setAttribute('x2', width - padding);
+            gridLine.setAttribute('y2', y);
+            gridLine.setAttribute('stroke', '#A55730');
+            gridLine.setAttribute('stroke-width', '0.5');
+            gridLine.setAttribute('opacity', '0.15');
+            svg.appendChild(gridLine);
+        }
 
         // Draw axes
         const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -687,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check if memory is allocated, if not, try to allocate
             const isAllocated = memoryPartitions.some(p => p.allocated && p.process && p.process.pid === current.pid);
             if (!isAllocated) {
-                if (!allocateMemory(current)) {
+                if (!allocateMemory(current, currentTime)) {
                     // Memory full, put back in queue to wait
                     queue.push(current);
                     continue;
@@ -757,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 (p) => p.allocated && p.process && p.process.pid === current.pid
             );
             if (!isAllocated) {
-                if (!allocateMemory(current)) {
+                if (!allocateMemory(current, currentTime)) {
                     // Memory full: the process must wait until another process frees a partition
                     updateRowState(current.pid, 'Waiting');
                     queue.push(current);
@@ -852,10 +912,12 @@ document.addEventListener('DOMContentLoaded', () => {
         turnaroundTimes = [];
         totalCpuTime = 0;
         totalSimulationTime = 0;
+        memoryAllocationHistory = [];
 
         // ✅ Reset processes locally ONLY (no fetch overwrite)
         currentProcesses.forEach((proc) => {
-            proc.burst_time = proc.original_burst_time ?? proc.burst_time;
+            proc.original_burst_time = proc.original_burst_time ?? proc.burst_time;
+            proc.burst_time = proc.original_burst_time;
             proc.state = 'Ready';
         });
 
@@ -868,6 +930,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ✅ Re-render UI immediately
         renderProcesses(currentProcesses);
+        updateProcessStats();
 
         isSimulating = true;
         startSimulationButton.disabled = true;
